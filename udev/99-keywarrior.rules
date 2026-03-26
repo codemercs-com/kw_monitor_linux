@@ -1,0 +1,39 @@
+# udev-Regel für KeyWarrior HID-Geräte (Code Mercenaries)
+#
+# Installation:
+#   sudo cp udev/99-keywarrior.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules
+#   sudo udevadm trigger
+#
+# Danach ist kein sudo mehr nötig, solange der Benutzer in der Gruppe
+# "plugdev" ist (auf Ubuntu/Debian standardmäßig der Fall).
+# Prüfen: groups $USER
+#
+# ──────────────────────────────────────────────────────────────────────────────
+# Erklärung der Felder:
+#   SUBSYSTEM=="hidraw"   → gilt nur für /dev/hidrawX-Knoten
+#   ATTRS{idVendor}       → USB Vendor ID  (4 Hex-Stellen, Kleinbuchstaben)
+#   ATTRS{idProduct}      → USB Product ID (4 Hex-Stellen, Kleinbuchstaben)
+#   TAG+="uaccess"        → moderner Ansatz: Zugriff für den angemeldeten
+#                           Desktop-Benutzer via systemd-logind (empfohlen)
+#   GROUP="plugdev"       → klassischer Ansatz: Gruppe bekommt Lesezugriff
+#   MODE="0660"           → Gruppe darf lesen + schreiben
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Code Mercenaries KeyWarrior-Familie
+# VID 07C0 = Code Mercenaries
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="07c0", ATTRS{idProduct}=="0181", TAG+="uaccess", GROUP="plugdev", MODE="0666"
+
+# Ermöglicht EVIOCGRAB auf den zugehörigen /dev/input/eventX-Knoten.
+# Hinweis: Besser ist es, den Benutzer einmalig zur Gruppe "input" hinzuzufügen
+#   (sudo usermod -aG input $USER), da das für alle Input-Geräte gilt und
+#   keine gerätespezifische Regel benötigt wird.
+SUBSYSTEM=="input", ATTRS{idVendor}=="07c0", ATTRS{idProduct}=="0181", GROUP="plugdev", MODE="0660"
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Falls ein anderer VID/PID benötigt wird, einfach weitere Zeilen ergänzen:
+#
+# SUBSYSTEM=="hidraw", ATTRS{idVendor}=="XXXX", ATTRS{idProduct}=="YYYY", \
+#     TAG+="uaccess", GROUP="plugdev", MODE="0660"
+# ──────────────────────────────────────────────────────────────────────────────

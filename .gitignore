@@ -1,0 +1,14 @@
+# Build artifacts
+*.o
+hid_monitor
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
